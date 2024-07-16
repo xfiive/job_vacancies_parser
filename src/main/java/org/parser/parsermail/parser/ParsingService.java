@@ -1,39 +1,38 @@
 package org.parser.parsermail.parser;
 
+import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Document;
+import org.parser.parsermail.entities.JobVacancy;
+import org.parser.parsermail.services.JobVacanciesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ParsingService {
 
     private static final Logger logger = LoggerFactory.getLogger(ParsingService.class);
 
-    private PageConsumer pageConsumer;
+    private final PageConsumer pageConsumer;
 
-    private PageParser pageParser;
+    private final PageParser pageParser;
 
-    @Autowired
-    public void setPageParser(PageParser pageParser) {
-        this.pageParser = pageParser;
-    }
+    private final JobVacanciesService jobVacanciesService;
 
-    @Autowired
-    public void setPageConsumer(PageConsumer pageConsumer) {
-        this.pageConsumer = pageConsumer;
-    }
-
-    @Scheduled(fixedRate = 30000)
-    public void start() {
+    public List<JobVacancy> parseAndGetValidJobs() {
 
         List<Document> pagesToParse = this.pageConsumer.getPages();
 
-        var jobs = this.pageParser.getJobVacancies(pagesToParse);
+        List<JobVacancy> jobs = this.pageParser.getJobVacancies(pagesToParse);
+
+        return this.jobVacanciesService.getValidJobVacancies(jobs);
+    }
+
+    public void dropThemAll() {
+        this.jobVacanciesService.clearVacanciesCollection();
     }
 
 

@@ -17,14 +17,12 @@ public class PageParser {
 
     private static final Logger logger = LoggerFactory.getLogger(ParsingService.class);
 
-    public List<List<JobVacancy>> getJobVacancies(@NotNull List<Document> documents) {
-        List<List<JobVacancy>> jobVacancies = new ArrayList<>();
-
+    public List<JobVacancy> getJobVacancies(@NotNull List<Document> documents) {
         var vacancies = this.carveJobVacancies(documents);
 
         logger.info("Amount of jobs scanned: {}", vacancies.size());
 
-        return new ArrayList<>();
+        return vacancies;
     }
 
     private @NotNull List<JobVacancy> carveJobVacancies(@NotNull List<Document> documents) {
@@ -51,8 +49,7 @@ public class PageParser {
                 jobVacancy.setContractType(contractType);
 
                 jobVacancies.add(jobVacancy);
-
-                logger.info("Saved job vacancy: {}", jobVacancy);
+//                logger.info("Saved job vacancy: {}", jobVacancy);
             }
         }
 
