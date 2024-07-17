@@ -42,6 +42,21 @@ public class MessageService {
 
     }
 
+    /*
+        TODO::
+            For tomorrow:
+            Add logic for passing other currencies except for euros(czech crones) maybe.
+            Add '/reset' command to drop 'vacancies' collection.
+            Add '/start' and '/stop' commands to call start or stop on handling onUpdateReceived method. ->
+                -> like I do call '/start' - then it continues sending me vacancies, no otherwise - stops.
+            Add '/showliked' to show all the messages from bot marked with any reaction from my side ->
+                -> then in future, probably, I'll add some parsing reactions mechanics.
+            Add buttons under each message with commands provided previously.
+        TODO
+
+    */
+
+
     private @NotNull String createJobVacancyMessageText(@NotNull JobVacancy jobVacancy) {
         StringBuilder sb = new StringBuilder();
 
