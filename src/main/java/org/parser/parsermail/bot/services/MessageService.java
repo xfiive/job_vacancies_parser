@@ -48,13 +48,13 @@ public class MessageService {
         sb.append(this.formatJobNameLine(jobVacancy.getJobName()));
         sb.append("\n");
         sb.append(this.formatCompanyNameLine(jobVacancy.getCompanyName()));
-        sb.append("\n\n");
+        sb.append("\n");
         sb.append(this.formatJobLocationLine(jobVacancy.getJobLocation()));
         sb.append("\n");
         sb.append(this.formatSalaryLine(jobVacancy.getSalary()));
         sb.append("\n");
         sb.append(this.formatContractTypeLine(jobVacancy.getContractType()));
-        sb.append("\n\n");
+        sb.append("\n");
         sb.append(this.formatJobLinkLine(jobVacancy.getJobLink()));
 
         return sb.toString();
@@ -62,7 +62,7 @@ public class MessageService {
 
     @Contract(pure = true)
     private @NotNull String formatJobLinkLine(String link) {
-        return "Job link: " + link + "\n";
+        return "Job link: \n" + link + "\n";
     }
 
     @Contract(pure = true)
