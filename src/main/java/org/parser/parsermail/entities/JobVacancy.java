@@ -32,6 +32,10 @@ public class JobVacancy {
     @Field
     private String contractType;
 
+    @Field
+    private boolean isLiked;
+
+
     @Override
     public String toString() {
         return "JobVacancy{" +
@@ -42,6 +46,7 @@ public class JobVacancy {
                 ", jobLocation='" + jobLocation + '\'' +
                 ", salary=" + salary +
                 ", contractType='" + contractType + '\'' +
+                ", isLiked='" + isLiked + '\'' +
                 '}';
     }
 
@@ -55,12 +60,13 @@ public class JobVacancy {
                 Objects.equals(jobLink, that.jobLink) &&
                 Objects.equals(companyName, that.companyName) &&
                 Objects.equals(jobLocation, that.jobLocation) &&
+                Objects.equals(isLiked, that.isLiked) &&
                 Objects.equals(contractType, that.contractType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(jobName, jobLink, companyName, jobLocation, salary, contractType);
+        return Objects.hash(jobName, jobLink, companyName, jobLocation, salary, contractType, isLiked);
     }
 
 }

@@ -55,7 +55,6 @@
             <version>7.4.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots-client</artifactId>
@@ -80,7 +79,6 @@
             <version>3.3.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
@@ -91,18 +89,6 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
             <version>5.7.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-core</artifactId>
-            <version>1.0.0-M2.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.deeplearning4j</groupId>
-            <artifactId>deeplearning4j-nlp</artifactId>
-            <version>1.0.0-M2.1</version>
         </dependency>
 
         <dependency>

@@ -16,11 +16,12 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,8 @@ public class JobVacanciesService {
 
     private final MongoTemplate mongoTemplate;
     private final JobVacancyRepository jobVacancyRepository;
+
+    private final ConcurrentHashMap<String, JobVacancy> cache = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void ensureIndexes() {
@@ -42,34 +45,48 @@ public class JobVacanciesService {
     }
 
     public List<JobVacancy> getValidJobVacancies(@NotNull List<JobVacancy> jobs) {
-        List<JobVacancy> validJobVacancies = new LinkedList<>();
-
-        for (JobVacancy jobVacancy : jobs) {
-            if (this.isJobVacancyValid(jobVacancy)) {
-                this.addJobVacancy(jobVacancy).ifPresent(validJobVacancies::add);
-            }
+        if (cache.isEmpty()) {
+            List<JobVacancy> existingVacancies = mongoTemplate.findAll(JobVacancy.class);
+            existingVacancies.forEach(vacancy -> {
+                String normalizedUrl = normalizeUrl(vacancy.getJobLink());
+                if (normalizedUrl != null) {
+                    cache.put(normalizedUrl, vacancy);
+                }
+            });
         }
-        return validJobVacancies;
+
+        return jobs.stream()
+                .filter(this::isJobVacancyValid)
+                .peek(this::addJobVacancy)
+                .collect(Collectors.toList());
     }
 
     public boolean isJobVacancyValid(@NotNull JobVacancy jobVacancy) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("jobName").is(jobVacancy.getJobName())
-                .and("companyName").is(jobVacancy.getCompanyName())
-                .and("jobLink").is(normalizeUrl(jobVacancy.getJobLink())));
+        if (jobVacancy.getJobName().equals("N/A") && jobVacancy.getCompanyName().equals("N/A") && jobVacancy.getJobLocation().equals("N/A")) {
+            return false;
+        }
 
-        return mongoTemplate.findOne(query, JobVacancy.class) == null;
+        String normalizedUrl = normalizeUrl(jobVacancy.getJobLink());
+        if (normalizedUrl == null) {
+            return false;
+        }
+
+        return !cache.containsKey(normalizedUrl);
     }
 
     public Optional<JobVacancy> addJobVacancy(@NotNull JobVacancy jobVacancy) {
-        jobVacancy.setId(generateUniqueId(jobVacancy));  // Устанавливаем уникальный ID
+        jobVacancy.setId(generateUniqueId(jobVacancy));
+        String normalizedUrl = normalizeUrl(jobVacancy.getJobLink());
+
+        if (normalizedUrl == null) {
+            return Optional.empty();
+        }
 
         try {
             mongoTemplate.insert(jobVacancy);
-            logger.info("Job Vacancy added: {}", jobVacancy);
+            cache.put(normalizedUrl, jobVacancy); // Update cache
             return Optional.of(jobVacancy);
         } catch (Exception e) {
-            logger.info("Job Vacancy already exists: {}", jobVacancy);
             return Optional.empty();
         }
     }
@@ -105,12 +122,16 @@ public class JobVacanciesService {
     }
 
     private @NotNull String generateUniqueId(@NotNull JobVacancy jobVacancy) {
-        String source = jobVacancy.getJobName() + jobVacancy.getCompanyName() + normalizeUrl(jobVacancy.getJobLink());
+        String source;
+        if (jobVacancy.getJobLink() != null)
+            source = jobVacancy.getJobName() + jobVacancy.getCompanyName() + normalizeUrl(jobVacancy.getJobLink());
+        else
+            source = jobVacancy.getJobName() + jobVacancy.getCompanyName();
         return Integer.toHexString(source.hashCode());
     }
 
     private String normalizeUrl(String url) {
-        if (url == null) {
+        if (url == null || url.isEmpty()) {
             return null;
         }
         String normalizedUrl = url;
