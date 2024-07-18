@@ -2,8 +2,6 @@ package org.parser.parsermail.bot;
 
 import org.jetbrains.annotations.NotNull;
 import org.parser.parsermail.bot.handlers.CommandHandler;
-import org.parser.parsermail.bot.handlers.Handler;
-import org.parser.parsermail.bot.handlers.MessageHandler;
 import org.parser.parsermail.bot.services.MessageService;
 import org.parser.parsermail.entities.JobVacancy;
 import org.parser.parsermail.parser.ParsingService;
@@ -28,32 +26,34 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     private static final Logger logger = LoggerFactory.getLogger(MyTelegramBot.class);
 
-    private final Map<Command, Handler> commandHandlers = new HashMap<>();
+    private final Map<Command, CommandHandler> commandHandlers = new HashMap<>();
 
-    private MessageService messageService;
+    private ParsingService parsingService;
 
     private JobVacanciesService jobVacanciesService;
 
-    private ParsingService parsingService;
+    private MessageService messageService;
     @Value("${bot.username}")
     private String botUsername;
     @Value("${bot.token}")
     private String botToken;
 
     @Autowired
-    public MyTelegramBot(CommandHandler commandHandler, MessageHandler messageHandler) {
-        commandHandlers.put(Command.ROLL, commandHandler);
-        commandHandlers.put(Command.PERSONAL, messageHandler);
-    }
-
-    @Autowired
-    public void setJobVacanciesService(JobVacanciesService jobVacanciesService) {
-        this.jobVacanciesService = jobVacanciesService;
+    public MyTelegramBot(CommandHandler commandHandler) {
+        commandHandlers.put(Command.START, commandHandler);
+        commandHandlers.put(Command.RESET, commandHandler);
+        commandHandlers.put(Command.SHOW_LIKED, commandHandler);
+        commandHandlers.put(Command.STOP, commandHandler);
     }
 
     @Autowired
     public void setParsingService(ParsingService parsingService) {
         this.parsingService = parsingService;
+    }
+
+    @Autowired
+    public void setJobVacanciesService(JobVacanciesService jobVacanciesService) {
+        this.jobVacanciesService = jobVacanciesService;
     }
 
     @Autowired
@@ -63,11 +63,11 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(@NotNull Update update) {
-        if (update.hasMessage() && update.getMessage().hasText() && this.isGroupChat(update.getMessage().getChat())) {
+        if (update.hasMessage() && update.getMessage().hasText() && !this.isGroupChat(update.getMessage().getChat())) {
             String message = update.getMessage().getText().split(" ")[0];
 
             Command command = Command.fromString(message);
-            Handler handler = commandHandlers.getOrDefault(command, commandHandlers.get(Command.UNKNOWN));
+            CommandHandler handler = commandHandlers.getOrDefault(command, commandHandlers.get(Command.UNKNOWN));
             handler.handle(update, this);
         }
     }
@@ -85,7 +85,6 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
         this.messageService.scheduleAndSendMessages(validJobVacancies, 5, this);
     }
-
 
     @Override
     public String getBotUsername() {

@@ -17,6 +17,8 @@ public class PageParser {
 
     private static final Logger logger = LoggerFactory.getLogger(ParsingService.class);
 
+    private static final double CZK_TO_EUR_CONVERSION_RATE = 25.0;
+
     public List<JobVacancy> getJobVacancies(@NotNull List<Document> documents) {
         var vacancies = this.carveJobVacancies(documents);
 
@@ -38,6 +40,10 @@ public class PageParser {
                 String companyName = getElementText(element, "span.employer", "N/A");
                 String jobLocation = getElementText(element, "span.job-location", "N/A");
                 int salary = getElementInt(element, "span.label.label-bordered.green", 0);
+                String reserveSalary = "N/A";
+                if (salary == Integer.MIN_VALUE)
+                    reserveSalary = this.getReserveSalary(element, "span.label.label-bordered.green", "N/A");
+
                 String contractType = getElementText(element, "span.contract-type", "N/A");
 
                 JobVacancy jobVacancy = new JobVacancy();
@@ -46,6 +52,7 @@ public class PageParser {
                 jobVacancy.setCompanyName(companyName);
                 jobVacancy.setJobLocation(jobLocation);
                 jobVacancy.setSalary(salary);
+                jobVacancy.setReserveSalary(reserveSalary);
                 jobVacancy.setContractType(contractType);
 
                 jobVacancies.add(jobVacancy);
@@ -66,6 +73,18 @@ public class PageParser {
         return foundElement != null ? foundElement.attr(attr) : defaultValue;
     }
 
+    private String getReserveSalary(@NotNull Element element, String cssQuery, String defaultValue) {
+        Element foundElement = element.select(cssQuery).first();
+        if (foundElement != null) {
+            try {
+                return foundElement.text();
+            } catch (NumberFormatException e) {
+                return "N/A";
+            }
+        }
+        return defaultValue;
+    }
+
     private int getElementInt(@NotNull Element element, String cssQuery, int defaultValue) {
         Element foundElement = element.select(cssQuery).first();
         if (foundElement != null) {
@@ -73,10 +92,10 @@ public class PageParser {
                 String text = foundElement.text().replaceAll("[^0-9]", "");
                 return Integer.parseInt(text);
             } catch (NumberFormatException e) {
-                return defaultValue;
+                logger.info("Found text element in vacancy where salary is in czech crones: {}", foundElement.text());
+                return Integer.MIN_VALUE;
             }
         }
         return defaultValue;
     }
-
 }

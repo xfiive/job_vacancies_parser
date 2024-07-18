@@ -30,6 +30,9 @@ public class JobVacancy {
     private int salary;
 
     @Field
+    private String reserveSalary;
+
+    @Field
     private String contractType;
 
     @Field
@@ -45,6 +48,7 @@ public class JobVacancy {
                 ", companyName='" + companyName + '\'' +
                 ", jobLocation='" + jobLocation + '\'' +
                 ", salary=" + salary +
+                ", reserveSalary='" + reserveSalary + '\'' +
                 ", contractType='" + contractType + '\'' +
                 ", isLiked='" + isLiked + '\'' +
                 '}';
@@ -61,12 +65,13 @@ public class JobVacancy {
                 Objects.equals(companyName, that.companyName) &&
                 Objects.equals(jobLocation, that.jobLocation) &&
                 Objects.equals(isLiked, that.isLiked) &&
+                Objects.equals(reserveSalary, that.reserveSalary) &&
                 Objects.equals(contractType, that.contractType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(jobName, jobLink, companyName, jobLocation, salary, contractType, isLiked);
+        return Objects.hash(jobName, jobLink, companyName, jobLocation, salary, reserveSalary, contractType, isLiked);
     }
 
 }

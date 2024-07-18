@@ -7,21 +7,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum Command {
-    ROLL("/"),
-    PERSONAL("/personal"),
-    GROUP("/group"),
-    HELP("/help"),
     START("/start"),
+    SHOW_LIKED("/showliked"),
+    RESET("/reset"),
+    STOP("/stop"),
     UNKNOWN("");
 
     private final List<String> commandTexts = new ArrayList<>();
 
     Command(@NotNull String... commandTexts) {
         this.commandTexts.addAll(Arrays.asList(commandTexts));
-    }
-
-    public List<String> getCommandTexts() {
-        return commandTexts;
     }
 
     public static Command fromString(String text) {
@@ -33,6 +28,10 @@ public enum Command {
             }
         }
         return UNKNOWN;
+    }
+
+    public List<String> getCommandTexts() {
+        return commandTexts;
     }
 
     public void addAlternateCommandText(String alternateCommandText) {

@@ -32,7 +32,7 @@ public class MessageService {
                         message.setChatId(myChatId);
                         message.setText(this.createJobVacancyMessageText(job));
                         try {
-                            bot.execute(message);
+                            var msg = bot.execute(message);
                         } catch (TelegramApiException e) {
                             e.printStackTrace();
                         }
@@ -45,7 +45,6 @@ public class MessageService {
     /*
         TODO::
             For tomorrow:
-            Add logic for passing other currencies except for euros(czech crones) maybe.
             Add '/reset' command to drop 'vacancies' collection.
             Add '/start' and '/stop' commands to call start or stop on handling onUpdateReceived method. ->
                 -> like I do call '/start' - then it continues sending me vacancies, no otherwise - stops.
@@ -66,9 +65,7 @@ public class MessageService {
         sb.append("\n");
         sb.append(this.formatJobLocationLine(jobVacancy.getJobLocation()));
         sb.append("\n");
-        sb.append(this.formatSalaryLine(jobVacancy.getSalary()));
-        sb.append("\n");
-        sb.append(this.formatContractTypeLine(jobVacancy.getContractType()));
+        sb.append(this.formatSalaryLine(jobVacancy.getSalary(), jobVacancy.getReserveSalary()));
         sb.append("\n");
         sb.append(this.formatJobLinkLine(jobVacancy.getJobLink()));
 
@@ -86,7 +83,10 @@ public class MessageService {
     }
 
     @Contract(pure = true)
-    private @NotNull String formatSalaryLine(int salary) {
+    private @NotNull String formatSalaryLine(int salary, String reserveSalary) {
+        if (salary == Integer.MIN_VALUE)
+            return "Salary: " + reserveSalary + "\n";
+
         if (10000 < salary) {
             String salaryStr = Integer.toString(salary);
 
@@ -100,7 +100,7 @@ public class MessageService {
             return "Salary: " + firstPart + "-" + secondPart + " EUR/month\n";
         }
         if (100 < salary) {
-            return "Salary: " + salary + "  EUR/month\n";
+            return "Salary: " + salary + " EUR/month\n";
         } else {
             if (salary < 100) {
                 return "Salary: " + salary + " EUR/hour\n";
