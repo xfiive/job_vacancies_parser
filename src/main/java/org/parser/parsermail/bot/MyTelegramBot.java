@@ -33,10 +33,13 @@ public class MyTelegramBot extends TelegramLongPollingBot {
     private JobVacanciesService jobVacanciesService;
 
     private MessageService messageService;
+
     @Value("${bot.username}")
     private String botUsername;
     @Value("${bot.token}")
     private String botToken;
+    @Value("${bot.my-chat-id}")
+    private String myChatId;
 
     @Autowired
     public MyTelegramBot(CommandHandler commandHandler) {
@@ -68,12 +71,13 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
             Command command = Command.fromString(message);
             CommandHandler handler = commandHandlers.getOrDefault(command, commandHandlers.get(Command.UNKNOWN));
-            handler.handle(update, this);
+            if (update.getMessage().getChatId().toString().equals(myChatId))
+                handler.handle(update, this);
         }
     }
 
     @Async
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 10 * 60 * 1000)
     public void fetchAndSendData() {
         List<JobVacancy> validJobVacancies = this.parsingService.parseAndGetValidJobs();
 

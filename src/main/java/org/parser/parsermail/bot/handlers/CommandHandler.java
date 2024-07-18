@@ -4,7 +4,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.parser.parsermail.bot.MyTelegramBot;
 import org.parser.parsermail.bot.services.MessageService;
-import org.parser.parsermail.entities.JobVacancy;
 import org.parser.parsermail.parser.ParsingService;
 import org.parser.parsermail.services.JobVacanciesService;
 import org.slf4j.Logger;
@@ -16,7 +15,6 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -87,15 +85,15 @@ public class CommandHandler {
     }
 
     private void showLikedVacancies(TelegramLongPollingBot bot, Long chatId) {
-        List<JobVacancy> likedVacancies = jobVacanciesService.findLikedVacancies();
-        if (likedVacancies.isEmpty()) {
-            sendMessage(bot, chatId, "No liked vacancies found.");
-        } else {
-            likedVacancies.forEach(vacancy -> {
-                String text = String.format("Job: %s\nLink: %s", vacancy.getJobName(), vacancy.getJobLink());
-                sendMessage(bot, chatId, text);
-            });
-        }
+//        List<JobVacancy> likedVacancies = jobVacanciesService.findLikedVacancies();
+//        if (likedVacancies.isEmpty()) {
+//            sendMessage(bot, chatId, "No liked vacancies found.");
+//        } else {
+//            likedVacancies.forEach(vacancy -> {
+//                String text = String.format("Job: %s\nLink: %s", vacancy.getJobName(), vacancy.getJobLink());
+//                sendMessage(bot, chatId, text);
+//            });
+//        }
     }
 
     public boolean isUserActive(Long chatId) {

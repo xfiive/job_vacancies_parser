@@ -24,7 +24,9 @@ public class MessageService {
     private String myChatId;
 
     public void scheduleAndSendMessages(@NotNull List<JobVacancy> jobs, int intervalInSeconds, TelegramLongPollingBot bot) {
-        IntStream.range(0, jobs.size())
+        int size = jobs.size();
+        IntStream.iterate(size - 1, i -> i - 1)
+                .limit(size)
                 .forEach(index -> {
                     JobVacancy job = jobs.get(index);
                     scheduler.schedule(() -> {
@@ -36,10 +38,8 @@ public class MessageService {
                         } catch (TelegramApiException e) {
                             e.printStackTrace();
                         }
-                    }, (long) index * intervalInSeconds, TimeUnit.SECONDS);
+                    }, (long) (size - 1 - index) * intervalInSeconds, TimeUnit.SECONDS);
                 });
-
-
     }
 
     /*
