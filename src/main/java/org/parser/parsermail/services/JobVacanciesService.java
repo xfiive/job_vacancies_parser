@@ -91,10 +91,6 @@ public class JobVacanciesService {
         }
     }
 
-    public List<JobVacancy> findLikedVacancies() {
-        return List.of();
-    }
-
     public boolean delete(@NotNull JobVacancy jobVacancy) {
         Query query = new Query();
         query.addCriteria(Criteria.where("jobName").is(jobVacancy.getJobName())

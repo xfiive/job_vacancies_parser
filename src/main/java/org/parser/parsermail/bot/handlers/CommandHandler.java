@@ -3,8 +3,6 @@ package org.parser.parsermail.bot.handlers;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.parser.parsermail.bot.MyTelegramBot;
-import org.parser.parsermail.bot.services.MessageService;
-import org.parser.parsermail.parser.ParsingService;
 import org.parser.parsermail.services.JobVacanciesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,21 +24,7 @@ public class CommandHandler {
     @Getter
     Set<Long> activeUsers = new ConcurrentSkipListSet<>();
 
-    private MessageService messageService;
-
-    private ParsingService parsingService;
-
     private JobVacanciesService jobVacanciesService;
-
-    @Autowired
-    public void setMessageService(MessageService messageService) {
-        this.messageService = messageService;
-    }
-
-    @Autowired
-    public void setParsingService(ParsingService parsingService) {
-        this.parsingService = parsingService;
-    }
 
     @Autowired
     public void setJobVacanciesService(JobVacanciesService jobVacanciesService) {
@@ -65,7 +49,6 @@ public class CommandHandler {
                 sendMessage(bot, chatId, "All vacancies have been reset.");
                 break;
             case "/showliked":
-                showLikedVacancies(bot, chatId);
                 break;
             default:
                 sendMessage(bot, chatId, "Unknown command.");
@@ -85,15 +68,6 @@ public class CommandHandler {
     }
 
     private void showLikedVacancies(TelegramLongPollingBot bot, Long chatId) {
-//        List<JobVacancy> likedVacancies = jobVacanciesService.findLikedVacancies();
-//        if (likedVacancies.isEmpty()) {
-//            sendMessage(bot, chatId, "No liked vacancies found.");
-//        } else {
-//            likedVacancies.forEach(vacancy -> {
-//                String text = String.format("Job: %s\nLink: %s", vacancy.getJobName(), vacancy.getJobLink());
-//                sendMessage(bot, chatId, text);
-//            });
-//        }
     }
 
     public boolean isUserActive(Long chatId) {
