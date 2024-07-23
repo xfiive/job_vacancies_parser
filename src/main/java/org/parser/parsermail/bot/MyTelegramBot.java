@@ -36,10 +36,9 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     @Value("${bot.username}")
     private String botUsername;
+
     @Value("${bot.token}")
     private String botToken;
-    @Value("${bot.my-chat-id}")
-    private String myChatId;
 
     @Autowired
     public MyTelegramBot(CommandHandler commandHandler) {
@@ -66,14 +65,6 @@ public class MyTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(@NotNull Update update) {
-        if (update.hasMessage() && update.getMessage().hasText() && !this.isGroupChat(update.getMessage().getChat())) {
-            String message = update.getMessage().getText().split(" ")[0];
-
-            Command command = Command.fromString(message);
-            CommandHandler handler = commandHandlers.getOrDefault(command, commandHandlers.get(Command.UNKNOWN));
-            if (update.getMessage().getChatId().toString().equals(myChatId))
-                handler.handle(update, this);
-        }
     }
 
     @Async
